@@ -8,6 +8,8 @@ public class Restaurant {
     public LocalTime openingTime;
     public LocalTime closingTime;
     private List<Item> menu = new ArrayList<Item>();
+    private List<Item> orders = new ArrayList<>();
+    private int orderTotal = 0;
 
     public Restaurant(String name, String location, LocalTime openingTime, LocalTime closingTime) {
         this.name = name;
@@ -63,4 +65,56 @@ public class Restaurant {
         return name;
     }
 
+    // Adds an item to order and logs out restaurant, menu & updated order details with updated total.
+    public int addItemToOrder(String itemName) throws itemNotFoundException {
+        displayDetails();
+
+        Item orderedItem = findItemByName(itemName);
+        if (orderedItem == null) {
+            displayOrderDetails();
+            throw new itemNotFoundException(itemName);
+        }
+
+        orders.add(orderedItem);
+        orderTotal += Math.max(orderedItem.getPrice(), 0);
+
+        System.out.println("\n" + itemName + " - Added to Order");
+
+        displayOrderDetails();
+
+        return orderTotal;
+    }
+
+    // Removes an item from order and logs out restaurant, menu & updated order details with updated total.
+    public int removeItemFromOrder(String itemName) throws itemNotFoundException {
+        displayDetails();
+
+        Item removedOrderItem = findItemByName(itemName);
+        if ((removedOrderItem == null) || !orders.remove(removedOrderItem)) {
+            displayOrderDetails();
+            throw new itemNotFoundException(itemName);
+        }
+
+        orderTotal -= Math.max(removedOrderItem.getPrice(), 0);
+
+        System.out.println("\n" + itemName + " - Removed From Order");
+
+        displayOrderDetails();
+
+        return orderTotal;
+    }
+
+    public int getOrderTotal() {
+        return orderTotal;
+    }
+
+    public List<Item> getOrders() {
+        return this.orders;
+    }
+
+    public void displayOrderDetails() {
+        System.out.println("Ordered Items:" + "\n" + getOrders() + "\n"
+                + "Total Amount: " + getOrderTotal() + "\n");
+
+    }
 }
