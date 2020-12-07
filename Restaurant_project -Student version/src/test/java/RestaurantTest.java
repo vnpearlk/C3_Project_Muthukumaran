@@ -77,4 +77,74 @@ class RestaurantTest {
     }
     //<<<<<<<<<<<<<<<<<<<<<<<MENU>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>ORDERS<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    @Test
+    public void adding_1_or_more_existing_items_to_empty_or_existing_order_should_sum_up_order_total_based_on_items_ordered() throws itemNotFoundException {
+        int curTotal = restaurant.addItemToOrder("Sweet corn soup");
+        assertEquals(119, curTotal);
+        assertEquals(119, restaurant.getOrderTotal());
+
+        restaurant.addToMenu("Idli", 10);
+        curTotal = restaurant.addItemToOrder("Idli");
+        assertEquals(129, curTotal);
+        assertEquals(129, restaurant.getOrderTotal());
+    }
+
+    @Test
+    public void adding_non_existing_menu_item_to_existing_order_should_throw_exception_without_changing_total() throws itemNotFoundException {
+        int curTotal = restaurant.addItemToOrder("Sweet corn soup");
+        assertThrows(itemNotFoundException.class, () -> restaurant.addItemToOrder("Idli"));
+        assertEquals(119, curTotal);
+        assertEquals(119, restaurant.getOrderTotal());
+    }
+
+    @Test
+    public void adding_non_existing_menu_item_to_empty_order_should_throw_exception_retaining_total_as_0() throws itemNotFoundException {
+        assertThrows(itemNotFoundException.class, () -> restaurant.addItemToOrder("Idli"));
+        assertEquals(0, restaurant.getOrderTotal());
+    }
+
+    @Test
+    public void removing_1_or_more_existing_menu_items_from_existing_order_should_reduce_order_total_based_on_items_removed() throws itemNotFoundException {
+        restaurant.addItemToOrder("Sweet corn soup");
+        restaurant.addToMenu("Idli", 10);
+        restaurant.addItemToOrder("Idli");
+
+        int curTotal = restaurant.removeItemFromOrder("Idli");
+        assertEquals(119, curTotal);
+        assertEquals(119, restaurant.getOrderTotal());
+
+        curTotal = restaurant.removeItemFromOrder("Sweet corn soup");
+        assertEquals(0, curTotal);
+        assertEquals(0, restaurant.getOrderTotal());
+    }
+
+    @Test
+    public void removing_existing_menu_item_from_existing_order_that_doesnt_contain_this_item_should_throw_exception_without_changing_total() throws itemNotFoundException {
+        restaurant.addItemToOrder("Sweet corn soup");
+        assertThrows(itemNotFoundException.class, () -> restaurant.removeItemFromOrder("Vegetable lasagne"));
+        assertEquals(119, restaurant.getOrderTotal());
+    }
+
+    @Test
+    public void removing_non_existing_menu_item_from_existing_order_should_throw_exception_without_changing_total() throws itemNotFoundException {
+        restaurant.addItemToOrder("Sweet corn soup");
+        assertThrows(itemNotFoundException.class, () -> restaurant.removeItemFromOrder("Idli"));
+        assertEquals(119, restaurant.getOrderTotal());
+    }
+
+    @Test
+    public void removing_existing_menu_items_from_empty_order_should_retain_total_as_0() {
+        assertThrows(itemNotFoundException.class, () -> restaurant.removeItemFromOrder("Sweet corn soup"));
+        assertEquals(0, restaurant.getOrderTotal());
+    }
+
+    @Test
+    public void removing_non_existing_menu_item_from_empty_order_should_throw_exception_retaining_total_as_0() {
+        assertThrows(itemNotFoundException.class, () -> restaurant.removeItemFromOrder("Idli"));
+        assertEquals(0, restaurant.getOrderTotal());
+    }
+
+    //<<<<<<<<<<<<<<<<<<<<<<<ORDERS>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
 }
